@@ -18,4 +18,4 @@ Trained a machine learning model that will predict a movie’s financial perform
 * Trained a linear regression model using Sci-kit Learn
 
 ## Webpage
-* Used Flask, HTML, and CSS to create a webpage that allows user input a sample Metascore to predict Box Office Revenue.
+* Used Flask, HTML, and CSS to create a webpage that allows user input a sample Metascore to predict Box Office Revenue
