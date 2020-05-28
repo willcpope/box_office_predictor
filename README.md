@@ -10,6 +10,10 @@ Trained a machine learning model that will predict a movie’s financial perform
 * There is a weak but positive correlation between Metascore and Box Office Revenue 
 * Metascores are normally distributed
 
+![box_office](static/assets/bovms.png)
+
+![metascore](static/assets/mshist.png)
+
 ## Machine Learning
 * Trained a linear regression model using Sci-kit Learn
 
