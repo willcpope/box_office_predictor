@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Box Office Predictor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,900&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script rel="text/javascript" src="static/js/app.js"></script>
+</head>
+<body>
+<header>
+    <h1>Movie Box Office Predictor</h1>
+</header>
+<br>
+<main>
+<div class ="row text-center">
+    <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+            <h3>Machine Learning in the Entertainment Industry</h3>
+            <p>Training a machine learning model to predict a movie's box office revenue based on an overall critical score.</p> 
+    </div>
+</div>
+<br>
+<div class="row text-center">
+  <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+    <h3>Step 1: Data Collection with Python</h3>
+    <p>Used <mark>Python</mark> to perform a <mark>webscrape</mark> of the IMDB website for the top 10,000 movies released from January 1, 2010 to December 31, 2019.</p>
+    <xmp>
+        from bs4 import BeautifulSoup
+        import pymongo
+        import requests
+        import json
+        from pprint import pprint
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        movie_titles = []
+
+        start = 1
+
+        while start < 10000:
+            imdb_url = f'https://www.imdb.com/search/title/?title_type=feature&release_date=2010-01-01,2019-12-31&
+                        view=simple&sort=num_votes,desc&start={start}&ref_=adv_nxt'
+            imdb_response = requests.get(imdb_url)
+            soup = BeautifulSoup(imdb_response.text, 'html')
+            results = soup.find_all('div', class_='col-title')
+    
+            for result in results:
+                title = result.find('a').text
+                movie_titles.append(title)
+                start += 50
+    </xmp>
+    <p>This returned the title of each film from the last decade that was then used to perform an <mark>API call</mark> to OMDB to return all of the available information.</p>
+    <xmp>
+        url = "http://www.omdbapi.com/?t="
+        api_key = API_KEY
+
+        output = []
+
+        for movie in movie_titles: 
+            response = requests.get(url + movie + api_key)
+            data = response.json()
+            output.append(data)
+    
+        with open('data.json', 'w') as outfile:
+            json.dump(output, outfile)
+    </xmp>
+    <p>Using a for loop we were able to extract the information wanted by accessing the <mark>JSON</mark> with the appropriate key value pairs.</p>
+    <xmp>
+        metascores = []
+
+        index = 0
+
+        while index < len(movie_titles):
+            for metascore in output[index]:
+                try:
+                    metascore = output[index]['Metascore']
+                    metascores.append(metascore)
+                    index = index + 1
+                except KeyError:
+                    metascores.append("NA")
+                    index = index + 1
+    </xmp>
+    <p>The data was then cleaned and a dataframe was created using <mark>Pandas</mark> and then exported to CSV for ease of use.</p>
+    <xmp>
+        df = pd.read_csv('Resources/Data/data.csv')
+        df.dropna(inplace=True)
+        df.reset_index(inplace=True)
+        df.drop(['Unnamed: 0', 'index'], axis=1, inplace=True)
+
+        df['Box Office'] = df['Box Office'].apply(lambda x: float(x.translate({ord('$'): None, ord(','): None})))
+        df['IMDB Votes'] = df['IMDB Votes'].apply(lambda x: float(x.translate({ord(','): None})))
+
+        df.to_csv('Resources/Data/clean_data.csv')
+    </xmp>
+</div>
+</div>
+<br>
+<div class="row text-center">
+  <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+    <h3>Step 2: Data Analysis with Tableau</h3>
+    <p>Box Office Revenue vs. Metascore</p>
+    <br>
+    <img src="static/assets/bovms.png" style="text-align: left; height: 400px; width: 600px;">
+    <p>Metascore Distribution</p>
+    <br>
+    <img src="static/assets/mshist.png" style="text-align: left; height: 400px; width: 600px;">
+    <br>
+  </div>
+</div>
+<br>
+<div class="row text-center">
+  <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+    <h3>Step 3: Machine Learning with Python</h3>
+    <br>
+    <p>With the data <mark>E</mark>xtracted, <mark>T</mark>ransformed, and <mark>L</mark>oaded, I built the model with <mark>SKLEARN</mark>.</p>
+    <br>
+    <p><mark>Linear Regression Model</mark></p>
+    <xmp>
+        from sklearn import tree
+        from sklearn.model_selection import train_test_split
+        from sklearn.datasets import make_regression
+        from sklearn.linear_model import LinearRegression
+    </xmp>
+    <br>
+    <br>
+  </div>
+</div>
+<div class="row text-center">
+    <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+        <h3>Step 4: Deploying the Model Using Flask</h3>
+        <p>Using <mark>Flask</mark>, <mark>HTML</mark>, and <mark>CSS</mark>, the model is available below and predicts box office revenue based on <mark>Metascore</mark>.</p>
+        <p><mark>Metascore</mark>: a number (1-100 where 100 is the best score) that captures the essence of the critical opinion of a movie.</p>
+        <br>
+        <p><b>Examples</b></p>
+        <p>Creed: <mark> 82 Metascore</mark> resulted in $81,157,671 Box Office Revenue</p>
+        <p>The Hateful Eight: <mark> 68 Metascore</mark> resulted in $54,116,191 Box Office Revenue</p>
+        <p>Zoolander 2: <mark>34 Metascore</mark> resulted in $29,782,560.00 Box Office Revenue</p>
+        <br>
+        <div class="input-group">
+            <div class="input-group-prepend">
+              <button class="btn btn-success" type="button" onclick="getInputValue();">Get Box Office!</button>
+            </div>
+            <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" id="user-input">
+            <script>
+                function getInputValue(){
+                    var inputValue = document.getElementById("user-input").value;
+                    var api = "http://127.0.0.1:5000/api/v1.0/linear_regression/" + inputValue
+                    fetch(api)
+                    .then(res => res.json())
+                    .then((out => {
+                        alert(out);
+                    }));
+                }
+            </script>
+        </div>
+          
+    </div>
+</div>
+<br>
+<br>
+<div class="row text-center">
+    <div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+      <h3>Challenges</h3>
+      <p><mark>Outliers:</mark> Outliers in the data included record setting films from the Star Wars and Marvel franchises.</p>
+      <p><mark>Time Constraints:</mark> Given more time we would have liked to of explored various ways of eliminating outliers and testing additional models with more features including Actors and Directors.</p>
+    </div>
+  </div>
+  <br>
+  <br>
+<div class="col-xs-12 col-s-12 col-md-12 col-lg-12">
+    <h3>Let's Connect</h3>
+    <p><b>linkedin.com/in/willpope</b></p>
+    <p><b>willcpope.github.io</b></p>
+    </div>
+</div>
+</main>
+<footer class="footer">
+    <div class="container-fluid">
+     <div class="row">
+        <div class="col-md-4 col-lg-4">
+            <img src="static/assets/gt-logo-gold.png"></img>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="text-muted">
+                <p class="text-center">Will Pope</p>
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-4">
+            <div class="text-right">
+                <a href="https://github.com/willcpope">
+                    <img src="static/assets/github_icon.svg"></img>
+                </a>
+            </div>
+        </div>
+     </div>
+    </div>
+</footer>
+</body>
+</html>
