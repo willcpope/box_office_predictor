@@ -1,5 +1,5 @@
 # Movie Box Office Predictor
-Trained a machine learning model that will predict a movie’s financial performance based on it’s critical reception. 
+Trained a machine learning model that will predict a movie’s financial performance based on its critical reception. 
 
 ## Data Collection
 * Web scraped the top 10,000 movies over the past decade from IMDB
