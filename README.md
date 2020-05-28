@@ -1,27 +1,17 @@
-# sturdy-waddle
+# Movie Box Office Predictor
+Trained a machine learning model that will predict a movie’s financial performance based on it’s critical reception. 
 
-Final BootCamp Project 
+## Data Collection
+* Web scraped the top 10,000 movies over the past decade from IMDB
+* Performed an API call to the OMDB website for information including box office revenue and reviews
 
-Machine learning ... movie analysis
+## Visualizations
+* Analyzed the data using Tableau
+* There is a weak but positive correlation between Metascore and Box Office Revenue 
+* Metascores are normally distributed
 
-Data : 
+## Machine Learning
+* Trained a linear regression model using Sci-kit Learn
 
-* Utilize IMDB list of movies released in the last decade https://www.imdb.com/search/title/?title_type=feature&release_date=2010-01-01,2019-12-31&view=simple&sort=num_votes,desc&start=1&ref_=adv_nxt
-
-* Perform web scrape to pull first 1,000 movie titles 
-
-* Call OMDB to return available data for those movies (JSON)
-
-* Clean Data (drop NAN, organize lists, convert strings to ints, etc.)
-
-* Create dataframe from cleaned data
-
-Visualizations :
-
-* Check data quality/integritry. Is our data normal? (Histogram, boxplot)
-
-* Visualize data to find any interesting trends (box office v. year; box office v. rating; box office v. year released; metascore v. year released)
-
-Machine Learning :
-
-* TBD
+## Webpage
+* Used Flask, HTML, and CSS to create a webpage that allows user input a sample Metascore to predict Box Office Revenue.
